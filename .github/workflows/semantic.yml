@@ -15,10 +15,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Install GitVersion to calculate the semantic version
-      # Install GitVersion tool
+      name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Use the correct GitVersion Action
       - name: Install GitVersion
-        uses: GitTools/actions/gitversion-action@v0.9.9  # This installs the GitVersion tool
+        uses: GitTools/actions/gitversion-action@v0.9.10  # Use the correct and working version
 
       # Run GitVersion and set VERSION environment variable
       - name: Calculate Semantic Version
@@ -26,6 +40,12 @@ jobs:
         run: |
           VERSION=$(gitversion /output json | jq -r .FullSemVer)
           echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save the version to GitHub environment
+
+      # Continue with the rest of your build
+      - name: Build project
+        working-directory: ./src
+        run: dotnet build
+
 
       - name: Log in to Docker Hub
         run: |
