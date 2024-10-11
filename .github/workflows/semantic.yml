@@ -1,4 +1,4 @@
-name: CI Pipeline - Docker Build and Push
+name: Semantic
 
 on:
   push:
@@ -16,19 +16,16 @@ jobs:
         uses: actions/checkout@v2
 
       # Install GitVersion to calculate the semantic version
+      # Install GitVersion tool
       - name: Install GitVersion
-        run: |
-          dotnet tool install --global GitVersion.Tool
-          export PATH="$PATH:~/.dotnet/tools"
+        uses: GitTools/actions/gitversion-action@v0.9.9  # This installs the GitVersion tool
 
+      # Run GitVersion and set VERSION environment variable
       - name: Calculate Semantic Version
-        id: gitversion
-        run: gitversion /output json
-
-      - name: Set Build Version
+        id: version
         run: |
           VERSION=$(gitversion /output json | jq -r .FullSemVer)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save the version to GitHub environment
 
       - name: Log in to Docker Hub
         run: |
