@@ -1,0 +1,19 @@
+
+image:
+  repository: stolek/dotnet-todo
+  tag: latest
+
+service:
+  name: todoapp-svc
+  type: NodePort
+  port: 80
+  targetPort: 8080
+  nodePort: 30001
+  app: todoapp  
+  protocol: TCP 
+
+pod:
+  name: todoapp-pod
+  containerName: todoapp  
+  containerPort: 8080
+  app: todoapp

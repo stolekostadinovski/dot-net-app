@@ -1,0 +1,43 @@
+name: CI Pipeline - Docker Build and Push
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Install GitVersion to calculate the semantic version
+      - name: Install GitVersion
+        run: |
+          dotnet tool install --global GitVersion.Tool
+          export PATH="$PATH:~/.dotnet/tools"
+
+      - name: Calculate Semantic Version
+        id: gitversion
+        run: gitversion /output json
+
+      - name: Set Build Version
+        run: |
+          VERSION=$(gitversion /output json | jq -r .FullSemVer)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/dotnet-todo:$VERSION .
+
+      - name: Push Docker Image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/dotnet-todo:$VERSION
