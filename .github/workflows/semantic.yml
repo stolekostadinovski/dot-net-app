@@ -15,21 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      name: CI Pipeline
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       # Use the correct GitVersion Action
       - name: Install GitVersion
         uses: GitTools/actions/gitversion-action@v0.9.10  # Use the correct and working version
