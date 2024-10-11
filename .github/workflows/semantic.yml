@@ -13,17 +13,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Install GitVersion
+      # Install GitVersion Tool
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.0.0
         with:
-          versionSpec: '6.x'  # Correctly indented
+          versionSpec: '6.x'
 
       # Calculate Semantic Version using GitVersion
       - name: Calculate Semantic Version
@@ -32,38 +31,31 @@ jobs:
           VERSION=$(gitversion /output json | jq -r .FullSemVer)
           echo "VERSION=$VERSION" >> $GITHUB_ENV  # Store VERSION as a GitHub environment variable
           echo "Version calculated: $VERSION"
+
       # Check if VERSION is empty and set a default value if necessary
       - name: Validate Version
         run: |
-         if [ -z "$VERSION" ]; then
-          echo "VERSION is empty, setting default version to 'latest'"
-          VERSION="latest"
-         fi
-           echo "Final VERSION: $VERSION"
- # Log in to DockerHub using token
+          if [ -z "$VERSION" ]; then
+            echo "VERSION is empty, setting default version to 'latest'"
+            VERSION="latest"
+          fi
+          echo "Final VERSION: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Make sure VERSION is available in the next steps
+
+      # Log in to DockerHub using token (before the build)
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}  # Docker Hub token     
+          password: ${{ secrets.DOCKER_TOKEN }}  # Use the Docker Hub token here
 
-
-
- # Build the Docker image with the calculated version
+      # Build the Docker image with the version
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/todo-app:${{ env.VERSION }} .
-
-      # Log in to DockerHub using token
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}  # Docker Hub token
+          echo "Building Docker image with version: $VERSION"
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/todo-app:$VERSION .
 
       # Push the Docker image to DockerHub
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/todo-app:${{ env.VERSION }}
-
-      # Optionally, you can add other steps here, such as testing the build or deploying
+          docker push ${{ secrets.DOCKER_USERNAME }}/todo-app:$VERSION
