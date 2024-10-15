@@ -18,21 +18,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Log in to Amazon ECR
-      run: |
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 216989135585.dkr.ecr.us-east-1.amazonaws.com
-
-    - name: Build Docker image
-      run: |
-        docker build -t todo-app .
-
-    - name: Tag Docker image
-      run: |
-        docker tag todo-app:latest 216989135585.dkr.ecr.us-east-1.amazonaws.com/todo-app-repo:latest
-
-    - name: Push Docker image to ECR
-      run: |
-        docker push 216989135585.dkr.ecr.us-east-1.amazonaws.com/todo-app-repo:latest
+    
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
@@ -52,6 +38,21 @@ jobs:
       env:
         TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}|}
+    
 
+    - name: Log in to Amazon ECR
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 216989135585.dkr.ecr.us-east-1.amazonaws.com
 
+    - name: Build Docker image
+      run: |
+        docker build -t todo-app .
+
+    - name: Tag Docker image
+      run: |
+        docker tag todo-app:latest 216989135585.dkr.ecr.us-east-1.amazonaws.com/todo-app-repo:latest
+
+    - name: Push Docker image to ECR
+      run: |
+        docker push 216989135585.dkr.ecr.us-east-1.amazonaws.com/todo-app-repo:latest
