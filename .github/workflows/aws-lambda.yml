@@ -21,16 +21,16 @@ jobs:
       with:
         terraform_version: 1.5.4 
     - name: List directory contents
-      run: ls -alh ./terraform
+      run: ls -alh terraform
     # Initialize Terraform
     - name: Terraform Init
       run: terraform init
-      working-directory: ./terraform
+      working-directory: terraform
 
     # Run Terraform Apply
     - name: Terraform Apply
       run: terraform apply -auto-approve
-      working-directory: ./terraform
+      working-directory: terraform
     
 
     - name: Log in to Amazon ECR
