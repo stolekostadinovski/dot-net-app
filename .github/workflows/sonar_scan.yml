@@ -1,7 +1,10 @@
 name: SonarCloud Analysis
 
+on:
+  push:
+    branches:
+      - main
 
-  workflow_dispatch:
 jobs:
   sonarcloud:
     runs-on: ubuntu-latest
