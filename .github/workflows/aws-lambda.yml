@@ -20,7 +20,8 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.5.4 
-
+    - name: List directory contents
+      run: ls -alh ./terraform
     # Initialize Terraform
     - name: Terraform Init
       run: terraform init
